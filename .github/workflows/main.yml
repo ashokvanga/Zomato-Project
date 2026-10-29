@@ -38,7 +38,7 @@ jobs:
           category: "/language:${{ matrix.language }}"
 
       - name: BUILD
-        run: npm run install
+        run: npm install
 
       - name: TEST
         run: echo "code is tested"
