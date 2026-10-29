@@ -27,6 +27,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended 
+
+      - name: Autobuild
+        uses: github/github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
 
       - name: BUILD
         run: npm install
