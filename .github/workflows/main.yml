@@ -1,3 +1,4 @@
+
 name: Secure DevSecOps Pipeline
 
 on:
@@ -5,15 +6,22 @@ on:
     branches:
       - master
 
+  pull_request:
+    branches:
+      - master
+
+  workflow_dispatch:
+
 jobs:
   build_and_package:
-    name: BUILD-JOB
+    name: BUILD-JOB (${{ matrix.language }})
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript-typescript' ]
+        language:
+          - javascript-typescript
 
     permissions:
       contents: read
@@ -21,35 +29,46 @@ jobs:
       actions: read
 
     steps:
+      # 1. Checkout source code
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 2. Configure Node.js and npm caching
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
+      # 3. Initialize CodeQL security scanning
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
           queries: security-extended
 
+      # 4. Install project dependencies
       - name: Install Dependencies
         run: npm ci
 
+      # 5. Run application build
       - name: Build Application
         run: npm run build
 
+      # 6. Execute unit tests
       - name: Run Tests
         run: npm test
 
+      # 7. Analyze source code for vulnerabilities
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
 
-
-
-            
+      # 8. Upload build artifact
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nodejs-build-artifact
+          path: dist/
+          if-no-files-found: warn
