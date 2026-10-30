@@ -72,3 +72,13 @@ jobs:
           name: nodejs-build-artifact
           path: dist/
           if-no-files-found: warn
+          
+      # 9. Deploy
+      - name: Deployement
+        run: echo "app is deployed"
+
+      - name: Rollback
+        if: failure()
+        run: echo "kubectl rollout undo deployment zomato"
+
+          
