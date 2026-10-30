@@ -75,7 +75,7 @@ jobs:
           
       # 9. Deploy
       - name: Deployement
-        run: echo "app is deployed
+        run: echo "app is deployed"
 
       - name: Rollback
         if: failure()
